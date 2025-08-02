@@ -370,10 +370,6 @@ async def get_metrics():
             detail="Failed to retrieve metrics"
         )
 
-@router.get("/debug/metrics-raw")
-async def debug_metrics():
-    db_metrics = await db_manager.get_metrics()
-    return {"raw_data": str(db_metrics), "type": str(type(db_metrics))}
 
 
 @router.post("/test/endpoint")

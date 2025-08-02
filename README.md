@@ -291,12 +291,15 @@ CREATE TABLE ticket_logs (
 
 The application exposes metrics at `/metrics`:
 
-- `tickets_total` - Total tickets processed
-- `tickets_by_department` - Tickets by department
-- `classification_confidence` - Average confidence scores
-- `processing_time_seconds` - Request processing time
-- `external_api_calls_total` - External API call counts
-- `retry_attempts_total` - Retry attempt metrics
+- `total_tickets_processed` – Total number of tickets processed by the system
+- `success_rate` - Percentage of successfully routed tickets (0.0–100.0)
+- `average_processing_time_ms` - Average ticket processing time in milliseconds
+- `department_distribution` - Number of tickets handled per department (e.g., "IT": 1)
+- `error_rate_by_type` - Error distribution by type (in percentages):
+  - classification_errors
+  - routing_errors 
+  - system_errors
+
 
 ### Logging
 
@@ -311,14 +314,14 @@ Structured JSON logging with the following levels:
 The `/health` endpoint provides:
 ```json
 {
-  "status": "healthy",
-  "timestamp": "2024-01-15T10:30:00Z",
-  "version": "1.0.0",
-  "dependencies": {
-    "database": "connected",
-    "gemini_api": "available",
-    "external_apis": "reachable"
-  }
+    "status": "healthy",
+    "timestamp": "2025-08-02T10:12:17.319047Z",
+    "version": "1.0.0",
+    "dependencies": {
+        "database": "healthy",
+        "ai_classifier": "healthy",
+        "ticket_router": "healthy"
+    }
 }
 ```
 
