@@ -5,6 +5,7 @@ Production-ready setup with middleware, error handling, and monitoring.
 
 import os
 import sys
+import time
 from contextlib import asynccontextmanager
 from typing import Dict, Any
 
@@ -351,6 +352,50 @@ def custom_openapi():
 
 
 app.openapi = custom_openapi
+
+# Error handlers
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Custom HTTP exception handler with logging"""
+    logger.warning(
+        "HTTP exception occurred",
+        status_code=exc.status_code,
+        detail=exc.detail,
+        path=request.url.path,
+        method=request.method
+    )
+
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": exc.detail,
+            "timestamp": time.time(),
+            "path": request.url.path
+        }
+    )
+
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """General exception handler for unexpected errors"""
+    logger.error(
+        "Unexpected error occurred",
+        error_type=type(exc).__name__,
+        error_message=str(exc),
+        path=request.url.path,
+        method=request.method
+    )
+
+    metrics.record_error(type(exc).__name__, "webhook")
+
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal server error",
+            "timestamp": time.time(),
+            "path": request.url.path
+        }
+    )
 
 # Development server configuration
 if __name__ == "__main__":
